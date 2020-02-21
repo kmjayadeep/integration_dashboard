@@ -13,5 +13,8 @@ module.exports = {
     user: {
         tokenSecret: process.env.TOKEN_SECRET || 'thisisahugesecretdonttellanyone',
         tokenExpires: 86400 //24hrs
+    },
+    github: {
+      token: process.env.GITHUB_TOKEN
     }
 }
