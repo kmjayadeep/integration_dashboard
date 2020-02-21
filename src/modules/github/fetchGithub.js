@@ -1,4 +1,5 @@
 const graphql = require('graphql-request');
+const Github = require('../../models/Github');
 const config = require('../../../config/config');
 const User = require('../../models/User');
 
@@ -15,7 +16,18 @@ async function fillData(username) {
   const query = `
     query($username: String!) { 
       user(login: $username) { 
-        name
+        pullRequests(first: 100) {
+          totalCount
+          nodes {
+            title
+            merged
+            closed
+            mergedAt
+            permalink
+            headRefName
+            createdAt
+          }
+        }
       }
     }
   `;
@@ -25,10 +37,25 @@ async function fillData(username) {
   }
 
   const data = await graphQLClient.request(query, variables);
-  console.log(JSON.stringify(data, undefined, 2))
+
+  const { pullRequests } = data.user;
+  let githubData = await Github.findOne({
+    username
+  });
+  if(!githubData){
+    githubData = new Github({
+      username
+    });
+  }
+  githubData.lastSync = Date.now();
+  githubData.pullRequestsCount = pullRequests.totalCount;
+  githubData.pullRequests = pullRequests.nodes;
+
+  const result = await githubData.save();
+  console.log(result);
 }
 
-fillData('kmjayadeep').catch(error => console.error(error))
+// fillData('kmjayadeep').catch(error => console.error(error))
 
 const fetchGithub = async () => {
   const users = await User.find({
