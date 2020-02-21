@@ -13,6 +13,15 @@ var schema = new mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+  integrations: {
+    github: {
+      active: {
+        type: Boolean,
+        default: true
+      },
+      username: String
+    }
   }
 });
 var User = mongoose.model('User', schema);

@@ -10,7 +10,6 @@ const userController = require('./src/modules/user/controller')
 const configureRoutes = (router) => {
 
   // General APIs
-
   router.get('/', (_, res) => res.send('Api v1.0'));
   router.get('/user/profile', userController.profile);
   router.post('/user/signup', userController.signup);
@@ -18,8 +17,8 @@ const configureRoutes = (router) => {
 
 
   // Github apis
-  router.post('/github/activate');
-  router.get('/github/stats/:interval');
+  router.post('/github/activate', githubController.activate);
+  router.get('/github/stats/:interval', githubController.getStats);
 }
 
 exports.initialize = async () => {

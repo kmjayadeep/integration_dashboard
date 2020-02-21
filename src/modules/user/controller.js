@@ -28,13 +28,14 @@ const login = async (req, res) => {
 const profile = async (req, res) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
-  const { _id, name, employeeId, email } = user;
+  const { _id, name, employeeId, email, integrations } = user;
   console.log(user)
   res.json({
     _id,
     name,
     email,
-    employeeId
+    employeeId,
+    integrations
   });
 }
 
