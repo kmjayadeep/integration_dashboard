@@ -18,13 +18,13 @@ const getStats = async (req, res) => {
   const githubData = await Github.findOne({
     username
   });
-  const day = moment();
   const yesterday = moment().subtract(1, 'days');
   const lastWeek = moment().subtract(7, 'days');
   const lastMonth = moment().subtract(60, 'days');
 
   let dailyPrCount = 0, weeklyPrCount = 0, monthlyPrCount = 0;
   let dailyIssueCount = 0, weeklyIssueCount = 0, monthlyIssueCount = 0;
+  let dailyCommitCount = 0, weeklyCommitCount = 0, monthlyCommitCount = 0;
 
   if (githubData && githubData.pullRequests) {
     for (pr of githubData.pullRequests) {
@@ -43,8 +43,6 @@ const getStats = async (req, res) => {
 
   if (githubData && githubData.issues) {
     for (issue of githubData.issues) {
-
-      console.log(issue)
       const createdAt = moment(issue.createdAt);
       if (createdAt.isAfter(yesterday)) {
         dailyIssueCount++;
@@ -58,18 +56,37 @@ const getStats = async (req, res) => {
     }
   }
 
+  if (githubData && githubData.commits) {
+    for (commit of githubData.commits) {
+      console.log(commit)
+      const createdAt = moment(commit.committedDate);
+      if (createdAt.isAfter(yesterday)) {
+        dailyCommitCount++;
+      }
+      if (createdAt.isAfter(lastWeek)) {
+        weeklyCommitCount++;
+      }
+      if (createdAt.isAfter(lastMonth)) {
+        monthlyCommitCount++;
+      }
+    }
+  }
+
   const stats = {
     daily: {
       pullRequests: dailyPrCount,
-      issues: dailyIssueCount
+      issues: dailyIssueCount,
+      commits: dailyCommitCount
     },
     weekly: {
       pullRequests: weeklyPrCount,
-      issues: weeklyIssueCount
+      issues: weeklyIssueCount,
+      commits: weeklyCommitCount
     },
     monthly: {
       pullRequests: monthlyPrCount,
-      issues: monthlyIssueCount
+      issues: monthlyIssueCount,
+      commits: monthlyCommitCount
     }
   };
   res.json(stats);

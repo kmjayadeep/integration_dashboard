@@ -25,6 +25,14 @@ var schema = new mongoose.Schema({
     title: String,
     closed: Boolean,
     url: String
+  }],
+  commits: [{
+    _id: false,
+    id: String,
+    committedDate: Date,
+    messageHeadline: String,
+    branch: String,
+    repository: String,
   }]
 });
 var Github = mongoose.model('Github', schema);

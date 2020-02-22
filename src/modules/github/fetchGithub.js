@@ -16,6 +16,7 @@ async function fillData(username) {
   const query = `
     query($username: String!) { 
       user(login: $username) { 
+        
         pullRequests(first: 100) {
           totalCount
           nodes {
@@ -28,6 +29,7 @@ async function fillData(username) {
             createdAt
           }
         }
+
         issues(first: 100) {
           totalCount
           nodes {
@@ -38,6 +40,31 @@ async function fillData(username) {
             url
           }
         }
+
+        repositories(first: 20, orderBy: {field: CREATED_AT, direction: DESC}) {
+          totalCount
+          nodes{
+            name
+            refs(refPrefix: "refs/heads/", first: 10) {
+              nodes{
+                name
+                target {
+                  ... on Commit {
+                    history(first: 100, author: {id: "MDQ6VXNlcjY3OTMyNjA="}) {
+                      totalCount
+                      nodes {
+                        id
+                        messageHeadline
+                        committedDate
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          } 
+        }
+
       }
     }
   `;
@@ -48,7 +75,20 @@ async function fillData(username) {
 
   const data = await graphQLClient.request(query, variables);
 
-  const { pullRequests, issues} = data.user;
+  const { pullRequests, issues, repositories} = data.user;
+  const repoData = repositories.nodes.map(repo=>{
+    const { name, refs } = repo;
+    const branches = refs.nodes.map(branch=>{
+      return branch.target.history.nodes.map(commit=>({
+          ...commit,
+          branch: branch.name,
+          repository: name
+        }));
+    });
+    const commits = [].concat(...branches);
+    return commits;
+  });
+  const commits = [].concat(...repoData);
   let githubData = await Github.findOne({
     username
   });
@@ -62,10 +102,13 @@ async function fillData(username) {
   githubData.pullRequests = pullRequests.nodes;
   githubData.issues = issues.nodes;
   githubData.issuesCount = issues.totalCount;
+  githubData.repositoriesCount = repositories.totalCount;
+  githubData.commits = commits;
 
   const result = await githubData.save();
   console.log(result.pullRequests.length);
   console.log(result.issues.length);
+  console.log(result.commits.length);
 }
 
 // fillData('kmjayadeep').catch(error => console.error(error))
