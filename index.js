@@ -1,5 +1,6 @@
 const express = require('express');
 const logger = require('morgan');
+const cors = require('cors')
 const bodyParser = require('body-parser');
 const db = require('./src/models/index');
 const authMiddleware = require('./src/middlewares/auth');
@@ -30,6 +31,7 @@ exports.initialize = async () => {
   app.use(bodyParser.urlencoded({
     extended: false
   }));
+  app.use(cors())
   const router = express.Router();
   configureRoutes(router);
   app.use(authMiddleware);
