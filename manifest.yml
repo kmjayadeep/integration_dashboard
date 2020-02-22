@@ -1,0 +1,5 @@
+---
+applications:
+- name: dashboard-server
+  random-route: true
+  memory: 2512M
