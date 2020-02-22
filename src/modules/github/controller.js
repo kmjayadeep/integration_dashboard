@@ -24,6 +24,7 @@ const getStats = async (req, res) => {
   const lastMonth = moment().subtract(60, 'days');
 
   let dailyPrCount = 0, weeklyPrCount = 0, monthlyPrCount = 0;
+  let dailyIssueCount = 0, weeklyIssueCount = 0, monthlyIssueCount = 0;
 
   if (githubData && githubData.pullRequests) {
     for (pr of githubData.pullRequests) {
@@ -40,15 +41,35 @@ const getStats = async (req, res) => {
     }
   }
 
+  if (githubData && githubData.issues) {
+    for (issue of githubData.issues) {
+
+      console.log(issue)
+      const createdAt = moment(issue.createdAt);
+      if (createdAt.isAfter(yesterday)) {
+        dailyIssueCount++;
+      }
+      if (createdAt.isAfter(lastWeek)) {
+        weeklyIssueCount++;
+      }
+      if (createdAt.isAfter(lastMonth)) {
+        monthlyIssueCount++;
+      }
+    }
+  }
+
   const stats = {
     daily: {
-      pullRequests: dailyPrCount
+      pullRequests: dailyPrCount,
+      issues: dailyIssueCount
     },
     weekly: {
-      pullRequests: weeklyPrCount
+      pullRequests: weeklyPrCount,
+      issues: weeklyIssueCount
     },
     monthly: {
-      pullRequests: monthlyPrCount
+      pullRequests: monthlyPrCount,
+      issues: monthlyIssueCount
     }
   };
   res.json(stats);

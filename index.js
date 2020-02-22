@@ -20,7 +20,7 @@ const configureRoutes = (router) => {
   // Github apis
   router.post('/github/activate', githubController.activate);
   router.get('/github/refresh', githubController.refresh);
-  router.get('/github/stats/:interval', githubController.getStats);
+  router.get('/github/stats', githubController.getStats);
 }
 
 exports.initialize = async () => {

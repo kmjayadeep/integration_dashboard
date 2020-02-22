@@ -28,6 +28,16 @@ async function fillData(username) {
             createdAt
           }
         }
+        issues(first: 100) {
+          totalCount
+          nodes {
+            title
+            createdAt
+            closed
+            closedAt
+            url
+          }
+        }
       }
     }
   `;
@@ -38,7 +48,7 @@ async function fillData(username) {
 
   const data = await graphQLClient.request(query, variables);
 
-  const { pullRequests } = data.user;
+  const { pullRequests, issues} = data.user;
   let githubData = await Github.findOne({
     username
   });
@@ -50,9 +60,12 @@ async function fillData(username) {
   githubData.lastSync = Date.now();
   githubData.pullRequestsCount = pullRequests.totalCount;
   githubData.pullRequests = pullRequests.nodes;
+  githubData.issues = issues.nodes;
+  githubData.issuesCount = issues.totalCount;
 
   const result = await githubData.save();
-  console.log(result);
+  console.log(result.pullRequests.length);
+  console.log(result.issues.length);
 }
 
 // fillData('kmjayadeep').catch(error => console.error(error))

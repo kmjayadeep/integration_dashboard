@@ -16,6 +16,15 @@ var schema = new mongoose.Schema({
     merged: Boolean,
     closed: Boolean,
     permalink: String
+  }],
+  issues: [{
+    _id: false,
+    id: String,
+    createdAt: Date,
+    closedAt: Date,
+    title: String,
+    closed: Boolean,
+    url: String
   }]
 });
 var Github = mongoose.model('Github', schema);
