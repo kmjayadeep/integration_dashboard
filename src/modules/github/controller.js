@@ -18,9 +18,11 @@ const getStats = async (req, res) => {
   const githubData = await Github.findOne({
     username
   });
-  const yesterday = moment().subtract(1, 'days');
-  const lastWeek = moment().subtract(7, 'days');
-  const lastMonth = moment().subtract(60, 'days');
+
+  // today 00:00 (yesterday midnight)
+  const yesterday = moment(moment().format('YYYY-MM-DD'));
+  const lastWeek = yesterday.clone().subtract(7, 'days');
+  const lastMonth = yesterday.clone().subtract(60, 'days');
 
   let dailyPrCount = 0, weeklyPrCount = 0, monthlyPrCount = 0;
   let dailyIssueCount = 0, weeklyIssueCount = 0, monthlyIssueCount = 0;
@@ -97,6 +99,61 @@ const refresh = (_req, res) => {
   res.json('refreshing')
 }
 
+const getGraphData = async (req, res) => {
+  const userId = req.user._id;
+  const user = await User.findById(userId);
+  const username = user.integrations.github.username;
+  const githubData = await Github.findOne({
+    username
+  });
+
+  const { issues, pullRequests, commits } = githubData;
+  const today = moment(moment().format('YYYY-MM-DD'));
+
+  const data = {};
+  const datesArray = [];
+  for(let i=0;i<30;i++){
+    const date = today.clone().subtract(i, 'days');
+    const formatted = date.format('YYYY-MM-DD');
+    data[formatted] = {
+      date: formatted,
+      commits: 0,
+      pullRequests: 0,
+      issues: 0
+    };
+    datesArray.push(formatted);
+  }
+
+  for(let commit of commits) {
+    const committedDate = moment(commit.committedDate).format('YYYY-MM-DD');
+    if(data[committedDate]) {
+      data[committedDate].commits++;
+    }
+  }
+
+  for(let issue of issues) {
+    const createdAt = moment(issue.createdAt).format('YYYY-MM-DD');
+    if(data[createdAt]) {
+      data[createdAt].commits++;
+    }
+  }
+
+  for(let pr of pullRequests) {
+    const createdAt = moment(pr.createdAt).format('YYYY-MM-DD');
+    if(data[createdAt]) {
+      data[createdAt].pullRequests++;
+    }
+  }
+
+  const graphData = datesArray.map(date=>(data[date]));
+  const result = {
+    data: graphData
+  };
+
+  res.json(result);
+}
+
 exports.getStats = getStats;
 exports.refresh = refresh;
 exports.activate = activate;
+exports.getGraphData = getGraphData

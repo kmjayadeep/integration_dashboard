@@ -21,6 +21,7 @@ const configureRoutes = (router) => {
   router.post('/github/activate', githubController.activate);
   router.get('/github/refresh', githubController.refresh);
   router.get('/github/stats', githubController.getStats);
+  router.get('/github/graph', githubController.getGraphData);
 }
 
 exports.initialize = async () => {
