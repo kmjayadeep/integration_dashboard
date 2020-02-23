@@ -15,6 +15,7 @@ module.exports = {
         tokenExpires: 86400 //24hrs
     },
     github: {
-      token: process.env.GITHUB_TOKEN
+      token: process.env.GITHUB_TOKEN,
+      refreshInterval: process.env.GITHUB_REFRESH_INTERVAL || 60 * 60 * 1000
     }
 }

@@ -111,7 +111,6 @@ async function fillData(username) {
   console.log(result.commits.length);
 }
 
-// fillData('kmjayadeep').catch(error => console.error(error))
 
 const fetchGithub = async () => {
   const users = await User.find({
@@ -119,7 +118,7 @@ const fetchGithub = async () => {
   });
 
   const usernames = users.map(user => user.integrations.github.username);
-  usernames.forEach(fillData);
+  return Promise.all(usernames.map(fillData));
 }
 
 module.exports = fetchGithub;

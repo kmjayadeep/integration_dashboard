@@ -4,8 +4,10 @@ const cors = require('cors')
 const bodyParser = require('body-parser');
 const db = require('./src/models/index');
 const authMiddleware = require('./src/middlewares/auth');
-const githubController = require('./src/modules/github/controller')
-const userController = require('./src/modules/user/controller')
+const githubController = require('./src/modules/github/controller');
+const userController = require('./src/modules/user/controller');
+const config = require('./config/config');
+const fetchGithub = require('./src/modules/github/fetchGithub');
 
 
 const configureRoutes = (router) => {
@@ -24,6 +26,16 @@ const configureRoutes = (router) => {
   router.get('/github/graph', githubController.getGraphData);
 }
 
+const configureCron = () => {
+  const { refreshInterval } = config.github;
+  console.log(`Fetching github data every ${refreshInterval} milliseconds`)
+  async function cron() {
+    await fetchGithub();
+    setTimeout(cron, refreshInterval);
+  }
+  cron();
+}
+
 exports.initialize = async () => {
   await db.initialize();
   const app = express();
@@ -37,5 +49,6 @@ exports.initialize = async () => {
   configureRoutes(router);
   app.use(authMiddleware);
   app.use('/api/v1/', router);
+  configureCron();
   return app;
 }
