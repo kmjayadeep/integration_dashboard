@@ -60,7 +60,6 @@ const getStats = async (req, res) => {
 
   if (githubData && githubData.commits) {
     for (commit of githubData.commits) {
-      console.log(commit)
       const createdAt = moment(commit.committedDate);
       if (createdAt.isAfter(yesterday)) {
         dailyCommitCount++;
@@ -134,7 +133,7 @@ const getGraphData = async (req, res) => {
   for(let issue of issues) {
     const createdAt = moment(issue.createdAt).format('YYYY-MM-DD');
     if(data[createdAt]) {
-      data[createdAt].commits++;
+      data[createdAt].issues++;
     }
   }
 

@@ -6,6 +6,7 @@ const db = require('./src/models/index');
 const authMiddleware = require('./src/middlewares/auth');
 const githubController = require('./src/modules/github/controller');
 const userController = require('./src/modules/user/controller');
+const insightsController = require('./src/modules/insights/controller');
 const config = require('./config/config');
 const fetchGithub = require('./src/modules/github/fetchGithub');
 
@@ -24,6 +25,8 @@ const configureRoutes = (router) => {
   router.get('/github/refresh', githubController.refresh);
   router.get('/github/stats', githubController.getStats);
   router.get('/github/graph', githubController.getGraphData);
+
+  router.get('/insights', insightsController.getInsights);
 }
 
 const configureCron = () => {
