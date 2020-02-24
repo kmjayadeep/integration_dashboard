@@ -20,16 +20,13 @@ const signup = async (req, res) => {
 }
 
 const login = async (req, res) => {
-
-  console.log(req.body)
-
+  res.json(req.boby);
 }
 
 const profile = async (req, res) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
   const { _id, name, employeeId, email, integrations } = user;
-  console.log(user)
   res.json({
     _id,
     name,
